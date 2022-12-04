@@ -32,9 +32,17 @@ namespace WindowsFormsApp2._0
 
         private void button1_Click(object sender, EventArgs e)
         {
-            XMLConvertPlant plantXML = new XMLConvertPlant();
-            plantXML.Convert("catalog.xml", comboBox1);
-            XMLConvertPlant.GetPlant(XMLConvertPlant.plantXMLs[2], textBoxC, textBoxB, textBoxZ, textBoxL, textBoxP, textBoxA);
+            try
+            {
+                Clear();
+                XMLConvertPlant plantXML = new XMLConvertPlant();
+                plantXML.Convert(XMLConvertPlant.OpenFile(), comboBox1);
+                XMLConvertPlant.GetPlant(XMLConvertPlant.plantXMLs[2], textBoxC, textBoxB, textBoxZ, textBoxL, textBoxP, textBoxA);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Файл не выбран или выбран некорректный файл", "Ошибка");
+            }
         }
 
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
@@ -58,6 +66,22 @@ namespace WindowsFormsApp2._0
             }
             XMLConvertPlant.GetPlant(XMLConvertPlant.plantXMLs[num], textBoxC, textBoxB, textBoxZ, textBoxL, textBoxP, textBoxA);
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            XMLConvertPlant.OpenFile();
+        }
+
+        private void Clear()
+        {
+            textBoxC.Text = "";
+            textBoxB.Text = "";
+            textBoxZ.Text = "";
+            textBoxL.Text = "";
+            textBoxP.Text = "";
+            textBoxA.Text = "";
+            comboBox1.Items.Clear();
         }
     }
 
@@ -160,7 +184,21 @@ namespace WindowsFormsApp2._0
                         break;
                 }
             }
-            //return $"Common: {common}\nBotanical: {botanical}\nZone: {zone}\nLight: {light}\nPrice: {price}\nAvailability: {availability}";
+        }
+        public static string OpenFile()
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.InitialDirectory = "c:\\";
+            openFileDialog1.Filter = "xml files (*.xml)|*.xml";
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                return openFileDialog1.FileName;
+            }
+
+            return null;
         }
     }
 }
