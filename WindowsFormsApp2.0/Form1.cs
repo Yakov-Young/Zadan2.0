@@ -32,23 +32,29 @@ namespace WindowsFormsApp2._0
 
         private void button1_Click(object sender, EventArgs e)
         {
+
             try
             {
-                Clear();
                 XMLConvertPlant plantXML = new XMLConvertPlant();
-                plantXML.Convert(XMLConvertPlant.OpenFile(), comboBox1);
-                XMLConvertPlant.GetPlant(XMLConvertPlant.plantXMLs[2], textBoxC, textBoxB, textBoxZ, textBoxL, textBoxP, textBoxA);
+                if (plantXML.Convert(Form1.OpenFile(), comboBox1))
+                {
+                    XMLConvertPlant.GetPlant(XMLConvertPlant.plantXMLs[XMLConvertPlant.plantXMLs.Count - 1], textBoxC, textBoxB, textBoxZ, textBoxL, textBoxP, textBoxA);
+                }
             }
             catch (Exception)
             {
-                MessageBox.Show("Файл не выбран или выбран некорректный файл", "Ошибка");
+                Clear();
+                MessageBox.Show("Выбран некорректный файл", "Ошибка");
             }
+            
+                
+            
         }
 
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
         {
             string name = (string)comboBox1.SelectedItem;
-            int num = -1;// = XMLConvertPlant.namesForCombo.FindIndex(x => x == (string)comboBox1.SelectedItem);
+            int num = -1;
             bool check = false;
             foreach (var item in Plant.namesForCombo)
             {
@@ -68,11 +74,6 @@ namespace WindowsFormsApp2._0
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            XMLConvertPlant.OpenFile();
-        }
-
         private void Clear()
         {
             textBoxC.Text = "";
@@ -81,13 +82,31 @@ namespace WindowsFormsApp2._0
             textBoxL.Text = "";
             textBoxP.Text = "";
             textBoxA.Text = "";
-            comboBox1.Items.Clear();
+            //comboBox1.Items.Clear();
+        }
+
+        private static string OpenFile()
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.InitialDirectory = "c:\\Users\\stars\\OneDrive\\Desktop";
+            openFileDialog1.Filter = "xml files (*.xml)|*.xml";
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                return openFileDialog1.FileName;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
     interface IXML
     {
-        void Convert(string fileName, ComboBox comboBox);
+        bool Convert(string fileName, ComboBox comboBox);
     }
     public class Plant
     {
@@ -104,8 +123,15 @@ namespace WindowsFormsApp2._0
     {
         public static List<Plant> plantXMLs = new List<Plant>();
 
-        public void Convert(string fileName, ComboBox comboBox)
+        public bool Convert(string fileName, ComboBox comboBox)
         {
+            if (fileName == null)
+            {
+                return false;
+            }
+
+            Plant.namesForCombo.Clear();
+            comboBox.Items.Clear();
 
             XmlDocument xDoc = new XmlDocument();
             xDoc.Load(fileName);
@@ -153,6 +179,11 @@ namespace WindowsFormsApp2._0
                 }
 
                 comboBox.SelectedIndex = Plant.namesForCombo.Count - 1;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         public static void GetPlant(Plant plant, params TextBox[] textBoxes)
@@ -184,21 +215,6 @@ namespace WindowsFormsApp2._0
                         break;
                 }
             }
-        }
-        public static string OpenFile()
-        {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-
-            openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "xml files (*.xml)|*.xml";
-            openFileDialog1.RestoreDirectory = true;
-
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                return openFileDialog1.FileName;
-            }
-
-            return null;
         }
     }
 }
